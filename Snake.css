@@ -1,25 +1,3 @@
-.game-container {
-    perspective: 800px;
-    width: 400px;
-    height: 400px;
-    margin: 0 auto;
-  }
-  
-  .snake {
-    width: 20px;
-    height: 20px;
-    position: relative;
-    background-color: green;
-    transform-origin: center center;
-    transition: transform 0.2s;
-  }
-  
-  .segment {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: green;
-    transform-origin: center center;
-    transition: transform 0.2s;
-  }
-  
+canvas {
+    border: 1px solid black;
+}
