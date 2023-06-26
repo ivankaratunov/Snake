@@ -1,85 +1,76 @@
-// Получение элемента canvas
-var canvas = document.getElementById("gameCanvas");
-var ctx = canvas.getContext("2d");
-
-// Размеры экрана
-var canvasWidth = canvas.width;
-var canvasHeight = canvas.height;
-
-// Размеры змейки
-var snakeSize = 20;
-var snakeWidth = 20;
-
-// Позиция змейки
-var x = canvasWidth / 2;
-var y = canvasHeight / 2;
-
-// Время задержки между обновлениями (в миллисекундах)
-var delay = 100;
-
-// Функция обновления игры
-function updateGame() {
-    // Очистка canvas
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-    // Обновление позиции змейки
-    var direction = getRandomDirection();
-    if (direction === "right") {
-        x += snakeSize;
-    } else if (direction === "left") {
-        x -= snakeSize;
-    } else if (direction === "up") {
-        y -= snakeSize;
-    } else if (direction === "down") {
-        y += snakeSize;
+// Функция обновления позиции змейки
+function updateSnake() {
+    var prevX = snake.offsetLeft;
+    var prevY = snake.offsetTop;
+  
+    switch (direction) {
+      case 'up':
+        snake.style.transform = 'rotateX(90deg)';
+        snake.style.top = (prevY - gridSize) + 'px';
+        break;
+      case 'down':
+        snake.style.transform = 'rotateX(-90deg)';
+        snake.style.top = (prevY + gridSize) + 'px';
+        break;
+      case 'left':
+        snake.style.transform = 'rotateY(90deg)';
+        snake.style.left = (prevX - gridSize) + 'px';
+        break;
+      case 'right':
+        snake.style.transform = 'rotateY(-90deg)';
+        snake.style.left = (prevX + gridSize) + 'px';
+        break;
     }
-
-    // Проверка на выход за границы экрана
-    if (x + snakeSize > canvasWidth || x < 0 || y + snakeSize > canvasHeight || y < 0) {
+  
+    // Создание нового сегмента змейки
+    createSegment();
+  
+    // Проверка на столкновение с собой
+    for (var i = 1; i < segments.length; i++) {
+      var segment = segments[i];
+      var segmentX = segment.offsetLeft;
+      var segmentY = segment.offsetTop;
+  
+      if (segmentX === prevX && segmentY === prevY) {
         gameOver();
+        return;
+      }
     }
-
-    // Отрисовка змейки
-    ctx.fillStyle = "black";
-    ctx.fillRect(x, y, snakeSize, snakeWidth);
-}
-
-// Функция получения случайного направления
-function getRandomDirection() {
-    var directions = ["right", "left", "up", "down"];
-    var randomIndex = Math.floor(Math.random() * directions.length);
-    return directions[randomIndex];
-}
-
-// Функция окончания игры
-function gameOver() {
+  
+    // Удаление последнего сегмента змейки
+    var lastSegment = segments.shift();
+    lastSegment.parentNode.removeChild(lastSegment);
+  }
+  
+  // Функция окончания игры
+  function gameOver() {
+    alert('Игра окончена');
     clearInterval(gameInterval);
-    displayRestartButton();
-}
-
-// Функция отображения кнопки "Начать заново"
-function displayRestartButton() {
-    var restartButton = document.createElement("button");
-    restartButton.innerHTML = "Начать заново";
-    restartButton.addEventListener("click", restartGame);
-    document.body.appendChild(restartButton);
-}
-
-// Функция перезапуска игры
-function restartGame() {
-    // Сброс значений
-    x = canvasWidth / 2;
-    y = canvasHeight / 2;
-
-    // Удаление кнопки "Начать заново"
-    var restartButton = document.querySelector("button");
-    if (restartButton) {
-        restartButton.parentNode.removeChild(restartButton);
-    }
-
+  }
+  
+  // Начальная инициализация игры
+  function init() {
+    // Создание сегментов змейки
+    createSegment();
+    createSegment();
+    createSegment();
+  
+    // Установка начальной позиции змейки
+    snake.style.left = '0px';
+    snake.style.top = '0px';
+  
+    // Обработка событий клавиатуры
+    document.addEventListener('keydown', changeDirection);
+    
+    // Получение фокуса для обработки событий клавиатуры
+    container.focus();
+  
     // Запуск игры
-    gameInterval = setInterval(updateGame, delay);
-}
-
-// Запуск игры
-var gameInterval = setInterval(updateGame, delay);
+    gameInterval = setInterval(updateSnake, 1000);
+  }
+  
+  // Инициализация игры при загрузке страницы
+  window.onload = function () {
+    init();
+  };
+  
